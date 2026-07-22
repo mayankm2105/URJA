@@ -90,5 +90,3 @@ overwrites the dev chunk manifest and every dev chunk 404s. Fix:
 rm -rf platform-new/.next
 ./run_platform.sh
 ```
-
-Never run a production build while `run_platform.sh` is up. Stop it first.
