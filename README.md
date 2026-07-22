@@ -1,4 +1,4 @@
-# Urja — Industrial EV Intelligence Platform
+# Urja - Industrial EV Intelligence Platform
 
 **ET AI Hackathon 2026 · PS3 — AI for Industrial EV Supply Chain & Asset Intelligence · Accelerating Net Zero.**
 
