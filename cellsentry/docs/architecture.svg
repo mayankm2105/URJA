@@ -1,0 +1,150 @@
+<svg viewBox="0 0 1240 680" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif" role="img">
+  <title>CellSentry architecture</title>
+  <desc>Data sources feed a Claude extraction agent into a Neo4j knowledge graph and a risk/lead-time engine, orchestrated into alerts plus a Claude briefing agent, exposed via FastAPI to a Next.js war-room; a quality/SPC module and an evaluation harness also feed the API.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-end">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b7a93"/>
+    </marker>
+  </defs>
+
+  <rect width="1240" height="680" fill="#0b1020"/>
+
+  <text x="32" y="46" fill="#e6ebf5" font-size="26" font-weight="700">CellSentry<tspan fill="#93a0b8" font-size="15" font-weight="400">  ·  Architecture</tspan></text>
+  <rect x="980" y="30" width="14" height="14" rx="3" fill="#10b981" opacity="0.85"/>
+  <text x="1001" y="42" fill="#93a0b8" font-size="12">Claude agent</text>
+
+  <text x="32" y="80" fill="#6b7a93" font-size="11" letter-spacing="1.5">DATA SOURCES</text>
+  <text x="300" y="80" fill="#6b7a93" font-size="11" letter-spacing="1.5">INTELLIGENCE CORE</text>
+  <text x="884" y="80" fill="#6b7a93" font-size="11" letter-spacing="1.5">API</text>
+  <text x="1056" y="80" fill="#6b7a93" font-size="11" letter-spacing="1.5">WAR-ROOM UI</text>
+
+  <!-- data sources -->
+  <g>
+    <rect x="32" y="92" width="200" height="60" rx="10" fill="#131a30" stroke="#2a3550"/>
+    <text x="46" y="118" fill="#e6ebf5" font-size="13" font-weight="600">Disruption signals</text>
+    <text x="46" y="136" fill="#93a0b8" font-size="10.5">news · sanctions · GDELT</text>
+
+    <rect x="32" y="164" width="200" height="60" rx="10" fill="#131a30" stroke="#2a3550"/>
+    <text x="46" y="190" fill="#e6ebf5" font-size="13" font-weight="600">Mineral shares</text>
+    <text x="46" y="208" fill="#93a0b8" font-size="10.5">USGS country data</text>
+
+    <rect x="32" y="236" width="200" height="60" rx="10" fill="#131a30" stroke="#2a3550"/>
+    <text x="46" y="262" fill="#e6ebf5" font-size="13" font-weight="600">Country-risk index</text>
+    <text x="46" y="280" fill="#93a0b8" font-size="10.5">geopolitical baseline</text>
+
+    <rect x="32" y="308" width="200" height="60" rx="10" fill="#131a30" stroke="#2a3550"/>
+    <text x="46" y="334" fill="#e6ebf5" font-size="13" font-weight="600">Cell-inspection lots</text>
+    <text x="46" y="352" fill="#93a0b8" font-size="10.5">incoming QC</text>
+  </g>
+
+  <!-- core -->
+  <rect x="288" y="86" width="560" height="520" rx="14" fill="#0d1426" stroke="#243049"/>
+
+  <!-- extraction agent (Claude) -->
+  <rect x="308" y="104" width="520" height="62" rx="10" fill="#10271f" stroke="#10b981"/>
+  <text x="324" y="130" fill="#e6ebf5" font-size="14" font-weight="700">Extraction Agent</text>
+  <rect x="762" y="114" width="50" height="16" rx="8" fill="#0e3a2b" stroke="#10b981"/>
+  <text x="787" y="126" fill="#6ff0c0" font-size="9.5" text-anchor="middle">Claude</text>
+  <text x="324" y="150" fill="#cdd6e6" font-size="10.5">event text → graph entities · forced tool-use</text>
+
+  <!-- knowledge graph (Neo4j) -->
+  <rect x="308" y="180" width="520" height="66" rx="10" fill="#131a30" stroke="#3a4a6a"/>
+  <text x="324" y="206" fill="#e6ebf5" font-size="14" font-weight="700">Knowledge Graph</text>
+  <rect x="758" y="190" width="54" height="16" rx="8" fill="#172445" stroke="#5b8cff"/>
+  <text x="785" y="202" fill="#9cc0ff" font-size="9.5" text-anchor="middle">Neo4j</text>
+  <text x="324" y="226" fill="#cdd6e6" font-size="10.5">multi-tier: country → supplier → material → cell → pack → product</text>
+
+  <!-- risk engine -->
+  <rect x="308" y="262" width="520" height="74" rx="10" fill="#131a30" stroke="#3a4a6a"/>
+  <rect x="308" y="262" width="5" height="74" rx="2" fill="#ee9800"/>
+  <text x="324" y="288" fill="#e6ebf5" font-size="14" font-weight="700">Risk &amp; Lead-time Engine</text>
+  <rect x="740" y="272" width="72" height="16" rx="8" fill="#2a2410" stroke="#ee9800"/>
+  <text x="776" y="284" fill="#f6c768" font-size="9.5" text-anchor="middle">NetworkX</text>
+  <text x="324" y="308" fill="#cdd6e6" font-size="10.5">HHI concentration · geopolitical · event boosts</text>
+  <text x="324" y="324" fill="#cdd6e6" font-size="10.5">→ downstream propagation → lead-time-to-impact</text>
+
+  <!-- orchestrator -->
+  <rect x="308" y="350" width="520" height="54" rx="10" fill="#131a30" stroke="#3a4a6a"/>
+  <text x="324" y="374" fill="#e6ebf5" font-size="14" font-weight="700">Scenario Orchestrator</text>
+  <text x="324" y="392" fill="#cdd6e6" font-size="10.5">apply events · recompute risk · emit alerts</text>
+
+  <!-- briefing agent (Claude) -->
+  <rect x="308" y="418" width="520" height="60" rx="10" fill="#10271f" stroke="#10b981"/>
+  <text x="324" y="443" fill="#e6ebf5" font-size="14" font-weight="700">Briefing &amp; Mitigation Agent</text>
+  <rect x="762" y="428" width="50" height="16" rx="8" fill="#0e3a2b" stroke="#10b981"/>
+  <text x="787" y="440" fill="#6ff0c0" font-size="9.5" text-anchor="middle">Claude</text>
+  <text x="324" y="462" fill="#cdd6e6" font-size="10.5">executive brief + recommended actions</text>
+
+  <!-- quality + eval -->
+  <rect x="308" y="492" width="250" height="96" rx="10" fill="#131a30" stroke="#3a4a6a"/>
+  <text x="324" y="518" fill="#e6ebf5" font-size="13" font-weight="700">Quality &amp; Traceability</text>
+  <text x="324" y="537" fill="#93a0b8" font-size="10.5">SPC drift detection</text>
+  <text x="324" y="553" fill="#93a0b8" font-size="10.5">cell → pack → VIN trace</text>
+
+  <rect x="578" y="492" width="250" height="96" rx="10" fill="#131a30" stroke="#3a4a6a"/>
+  <text x="594" y="518" fill="#e6ebf5" font-size="13" font-weight="700">Evaluation Harness</text>
+  <text x="594" y="537" fill="#93a0b8" font-size="10.5">lead-time · precision/recall</text>
+  <text x="594" y="553" fill="#93a0b8" font-size="10.5">reproducible metrics</text>
+
+  <!-- internal flow arrows -->
+  <g stroke="#6b7a93" stroke-width="1.4" marker-end="url(#arr)">
+    <line x1="568" y1="166" x2="568" y2="178"/>
+    <line x1="568" y1="246" x2="568" y2="260"/>
+    <line x1="568" y1="336" x2="568" y2="348"/>
+    <line x1="568" y1="404" x2="568" y2="416"/>
+  </g>
+
+  <!-- API -->
+  <rect x="880" y="210" width="150" height="180" rx="12" fill="#131a30" stroke="#a78bfa"/>
+  <text x="900" y="238" fill="#e6ebf5" font-size="15" font-weight="700">FastAPI</text>
+  <g fill="#bcd0ee" font-size="11.5" font-family="monospace">
+    <text x="900" y="266">/graph</text>
+    <text x="900" y="288">/events</text>
+    <text x="900" y="310">/scenario</text>
+    <text x="900" y="332">/quality</text>
+    <text x="900" y="354">/eval</text>
+  </g>
+
+  <!-- UI -->
+  <rect x="1052" y="200" width="160" height="250" rx="12" fill="#0e1530" stroke="#38bdf8"/>
+  <text x="1070" y="228" fill="#e6ebf5" font-size="14" font-weight="700">Next.js</text>
+  <text x="1070" y="246" fill="#93a0b8" font-size="11">War-Room UI</text>
+  <rect x="1068" y="262" width="40" height="150" rx="6" fill="#131a30" stroke="#2a3550"/>
+  <rect x="1116" y="262" width="40" height="150" rx="6" fill="#131a30" stroke="#2a3550"/>
+  <rect x="1164" y="262" width="40" height="150" rx="6" fill="#131a30" stroke="#2a3550"/>
+  <text x="1088" y="426" fill="#93a0b8" font-size="9" text-anchor="middle">signals</text>
+  <text x="1136" y="426" fill="#93a0b8" font-size="9" text-anchor="middle">graph</text>
+  <text x="1184" y="426" fill="#93a0b8" font-size="9" text-anchor="middle">alerts</text>
+  <circle cx="1130" cy="285" r="5" fill="#10b981"/>
+  <circle cx="1146" cy="285" r="5" fill="#ee9800"/>
+  <circle cx="1162" cy="285" r="5" fill="#ff5d52"/>
+
+  <!-- data -> core arrows -->
+  <g stroke="#6b7a93" stroke-width="1.4" marker-end="url(#arr)">
+    <line x1="232" y1="122" x2="286" y2="130"/>
+    <line x1="232" y1="194" x2="286" y2="206"/>
+    <line x1="232" y1="266" x2="286" y2="290"/>
+    <line x1="232" y1="338" x2="286" y2="520"/>
+  </g>
+
+  <!-- core -> API arrows -->
+  <g stroke="#6b7a93" stroke-width="1.4" marker-end="url(#arr)">
+    <line x1="850" y1="448" x2="878" y2="300"/>
+    <line x1="850" y1="540" x2="878" y2="350"/>
+  </g>
+
+  <!-- API <-> UI -->
+  <line x1="1030" y1="288" x2="1050" y2="288" stroke="#6b7a93" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="1040" y="280" fill="#6b7a93" font-size="9" text-anchor="middle">HTTP</text>
+  <line x1="1050" y1="312" x2="1032" y2="312" stroke="#3a4658" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- bottom legend -->
+  <g>
+    <rect x="32" y="636" width="13" height="13" rx="3" fill="#10b981" opacity="0.85"/>
+    <text x="51" y="647" fill="#93a0b8" font-size="11">Claude agent</text>
+    <circle cx="170" cy="643" r="5" fill="#10b981"/>
+    <circle cx="188" cy="643" r="5" fill="#ee9800"/>
+    <circle cx="206" cy="643" r="5" fill="#ff5d52"/>
+    <text x="218" y="647" fill="#93a0b8" font-size="11">risk: low · medium · high</text>
+  </g>
+</svg>

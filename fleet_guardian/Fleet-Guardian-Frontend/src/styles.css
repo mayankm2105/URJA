@@ -1,0 +1,119 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-panel: var(--panel);
+  --color-panel-raised: var(--panel-raised);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+
+  --color-healthy: var(--healthy);
+  --color-healthy-bg: var(--healthy-bg);
+  --color-watch: var(--watch);
+  --color-watch-bg: var(--watch-bg);
+  --color-critical: var(--critical);
+  --color-critical-bg: var(--critical-bg);
+
+  --color-chart-grid: var(--chart-grid);
+
+  /* Map shadcn tokens onto the EV APM dark palette so any shadcn component
+     inherits the theme without hardcoded colors. */
+  --color-background: var(--canvas);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--panel);
+  --color-card-foreground: var(--text-primary);
+  --color-popover: var(--panel-raised);
+  --color-popover-foreground: var(--text-primary);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--canvas);
+  --color-secondary: var(--panel-raised);
+  --color-secondary-foreground: var(--text-primary);
+  --color-muted: var(--panel-raised);
+  --color-muted-foreground: var(--text-secondary);
+  --color-accent-foreground: var(--canvas);
+  --color-destructive: var(--critical);
+  --color-destructive-foreground: var(--text-primary);
+  --color-border: var(--border-subtle);
+  --color-input: var(--border-strong);
+  --color-ring: var(--accent);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+:root {
+  --canvas: #07101D;
+  --panel: #0F1B2D;
+  --panel-raised: #142238;
+  --border-subtle: #1E2D42;
+  --border-strong: #2A3D57;
+
+  --text-primary: #F5F7FA;
+  --text-secondary: #8A97AA;
+  --text-tertiary: #5A6980;
+
+  --accent: #38BDF8;
+  --accent-hover: #5FCCFA;
+
+  --healthy: #34D399;
+  --healthy-bg: #0F2E22;
+  --watch: #FBBF24;
+  --watch-bg: #332608;
+  --critical: #F87171;
+  --critical-bg: #331313;
+
+  --chart-grid: #1A2942;
+}
+
+@layer base {
+  * {
+    border-color: var(--border-subtle);
+  }
+  html, body {
+    background-color: var(--canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@utility eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+@utility mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@utility skeleton {
+  background: linear-gradient(90deg, var(--panel) 0%, var(--panel-raised) 50%, var(--panel) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 6px;
+}

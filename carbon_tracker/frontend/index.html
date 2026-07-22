@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CarbonPulse Intelligence | Net Zero Dashboard</title>
+    <!-- Tailwind CSS with CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Chart.js for beautiful charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Leaflet.js for Geospatial Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Tailwind Config containing exact colors from Stitch design tokens -->
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "tertiary-fixed-dim": "#bec7d2",
+              "surface-container-lowest": "#0a0e14",
+              "on-tertiary-container": "#5a636c",
+              "background": "#10141a",
+              "on-secondary-container": "#b1b5bf",
+              "on-surface": "#dfe2eb",
+              "secondary-fixed": "#dee2ec",
+              "surface-container-low": "#181c22",
+              "secondary": "#c2c7d0",
+              "on-tertiary": "#29313a",
+              "surface": "#10141a",
+              "primary-fixed": "#60ff98",
+              "inverse-on-surface": "#2d3137",
+              "inverse-primary": "#006d36",
+              "inverse-surface": "#dfe2eb",
+              "surface-tint": "#00e478",
+              "secondary-container": "#42474f",
+              "on-primary-fixed": "#00210c",
+              "on-primary": "#003919",
+              "secondary-fixed-dim": "#c2c7d0",
+              "surface-dim": "#10141a",
+              "on-tertiary-fixed": "#141c24",
+              "on-tertiary-fixed-variant": "#3f4850",
+              "tertiary-fixed": "#dae3ee",
+              "primary-container": "var(--color-primary-container, #00ff87)",
+              "surface-variant": "#31353c",
+              "on-secondary": "#2c3138",
+              "surface-container": "#1c2026",
+              "on-secondary-fixed": "#171c23",
+              "error-container": "#93000a",
+              "tertiary-container": "#d6dfea",
+              "surface-container-high": "#262a31",
+              "error": "#ffb4ab",
+              "primary-fixed-dim": "var(--color-primary-fixed-dim, #00e478)",
+              "outline-variant": "#3b4b3d",
+              "surface-bright": "#353940",
+              "on-surface-variant": "#b9cbb9",
+              "on-secondary-fixed-variant": "#42474f",
+              "on-primary-container": "#007138",
+              "outline": "#849585",
+              "on-error-container": "#ffdad6",
+              "tertiary": "#f9faff",
+              "on-primary-fixed-variant": "#005227",
+              "primary": "#f1ffef",
+              "on-error": "#690005",
+              "surface-container-highest": "#31353c",
+              "on-background": "#dfe2eb"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "margin-page": "40px",
+              "stack-lg": "32px",
+              "stack-sm": "8px",
+              "gutter": "24px",
+              "margin-mobile": "16px",
+              "sidebar-width": "280px",
+              "stack-md": "16px"
+            },
+            "fontFamily": {
+              "headline-md": ["Inter"],
+              "body-md": ["Inter"],
+              "headline-lg": ["Inter"],
+              "body-lg": ["Inter"],
+              "label-sm": ["Inter"],
+              "display-lg": ["Inter"],
+              "mono-data": ["monospace"],
+              "label-md": ["Inter"],
+              "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+              "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+              "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+              "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+              "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+              "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+              "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+              "mono-data": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+              "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+              "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(22, 27, 34, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(240, 246, 252, 0.1);
+        }
+        .neon-glow {
+            text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+        }
+        .chart-grid {
+            background-image: linear-gradient(rgba(240, 246, 252, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(240, 246, 252, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0D1117;
+            color: #dfe2eb;
+            overflow-x: hidden;
+        }
+        /* Custom dark styles for Leaflet */
+        .leaflet-container {
+            background: #10141a !important;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md">
+
+    <!-- Side Navigation Bar -->
+    <aside class="fixed left-0 top-0 h-screen w-[280px] bg-surface-container-lowest/60 backdrop-blur-md border-r border-white/10 shadow-2xl flex flex-col py-stack-lg z-50">
+        <div class="px-6 mb-10">
+            <h1 class="text-headline-md font-headline-md font-bold text-primary-container tracking-tight">CarbonPulse</h1>
+            <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Industrial EV Suite</p>
+        </div>
+        <nav class="flex-1 space-y-2 px-3">
+            <button id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-primary-container font-bold border-r-2 border-primary-container bg-white/5 transition-colors">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-label-md font-label-md">Dashboard</span>
+            </button>
+            <button id="nav-emissions" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant font-medium hover:bg-white/5 hover:text-primary-fixed-dim transition-colors">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="text-label-md font-label-md">Emissions Intelligence</span>
+            </button>
+            <button id="nav-map" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant font-medium hover:bg-white/5 hover:text-primary-fixed-dim transition-colors">
+                <span class="material-symbols-outlined">map</span>
+                <span class="text-label-md font-label-md">Geospatial Route Map</span>
+            </button>
+            <button id="nav-ai" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant font-medium hover:bg-white/5 hover:text-primary-fixed-dim transition-colors">
+                <span class="material-symbols-outlined">psychology</span>
+                <span class="text-label-md font-label-md">AI Carbon Advisor</span>
+            </button>
+        </nav>
+        <div class="mt-auto px-3 space-y-2">
+            <button id="btn-generate-report" onclick="generateReport()" class="w-full mb-6 bg-primary-container text-on-primary-container font-bold py-3 rounded-lg hover:opacity-90 transition-all active:scale-95 duration-100 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">summarize</span>
+                Generate Report
+            </button>
+            <div class="flex items-center gap-3 px-4 py-6 border-t border-white/5">
+                <div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden flex items-center justify-center border border-white/10">
+                    <span class="material-symbols-outlined text-primary-container">account_circle</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-label-md font-label-md text-on-surface">Alex Chen</span>
+                    <span class="text-label-sm font-label-sm text-on-surface-variant">Fleet Director</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="ml-[280px] min-h-screen flex flex-col">
+        <!-- Top App Bar -->
+        <header class="flex justify-between items-center h-16 px-margin-page bg-surface-container-lowest/20 backdrop-blur-sm border-b border-white/5 sticky top-0 z-40">
+            <h2 id="page-title" class="text-headline-md font-headline-md font-bold text-primary-container">CarbonPulse Intelligence</h2>
+            <div class="flex items-center gap-6">
+                <!-- Search Analytics -->
+                <div class="relative group" id="search-wrapper">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary-container transition-colors">search</span>
+                    <input id="search-input" class="bg-surface-variant/30 border border-white/10 rounded-full pl-10 pr-4 py-1.5 text-label-md font-label-md focus:ring-1 focus:ring-primary-container focus:border-primary-container outline-none w-64 transition-all" placeholder="Search analytics..." type="text" autocomplete="off"/>
+                    <!-- Search Dropdown -->
+                    <div id="search-dropdown" class="hidden absolute top-full left-0 mt-2 w-80 bg-surface-container border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                        <div id="search-results" class="max-h-72 overflow-y-auto py-2"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <!-- Notifications Bell -->
+                    <div class="relative" id="notif-wrapper">
+                        <button id="btn-notifications" class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim transition-all relative" aria-label="Notifications">notifications
+                        </button>
+                        <span id="notif-badge" class="absolute -top-1 -right-1 bg-error text-on-error text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                        <!-- Notification Dropdown -->
+                        <div id="notif-dropdown" class="hidden absolute top-full right-0 mt-3 w-96 bg-surface-container border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                                <span class="text-label-md font-bold text-on-surface">Alerts &amp; Notifications</span>
+                                <button id="btn-mark-all-read" class="text-label-sm text-primary-container hover:underline">Mark all read</button>
+                            </div>
+                            <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-white/5"></div>
+                            <div class="px-4 py-3 border-t border-white/5 text-center">
+                                <span class="text-label-sm text-on-surface-variant">Real-time alerts from your fleet &amp; emission engine</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Settings -->
+                    <div class="relative" id="settings-wrapper">
+                        <button id="btn-settings" class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim transition-all" aria-label="Settings">settings</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ─── SETTINGS MODAL ─── -->
+        <div id="settings-modal" class="hidden fixed inset-0 z-[999] flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="settings-backdrop"></div>
+            <div class="relative bg-surface-container border border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary-container">settings</span>
+                        <h3 class="text-headline-md font-bold text-on-surface">Settings</h3>
+                    </div>
+                    <button id="btn-close-settings" class="material-symbols-outlined text-on-surface-variant hover:text-primary-container transition-colors">close</button>
+                </div>
+                <div class="px-6 py-5 space-y-6">
+                    <!-- Appearance -->
+                    <div>
+                        <p class="text-label-sm uppercase tracking-wider text-on-surface-variant mb-3">Appearance</p>
+                        <div class="flex items-center justify-between py-3 border-b border-white/5">
+                            <div>
+                                <p class="text-label-md text-on-surface font-medium">Accent Color</p>
+                                <p class="text-label-sm text-on-surface-variant mt-0.5">Primary highlight color</p>
+                            </div>
+                            <div class="flex gap-2" id="accent-options">
+                                <button data-accent="green" class="accent-btn w-7 h-7 rounded-full bg-[#00e478] ring-2 ring-white/60 ring-offset-2 ring-offset-surface-container transition-all" title="Green"></button>
+                                <button data-accent="cyan" class="accent-btn w-7 h-7 rounded-full bg-[#00d4ff] ring-0 ring-offset-2 ring-offset-surface-container transition-all" title="Cyan"></button>
+                                <button data-accent="violet" class="accent-btn w-7 h-7 rounded-full bg-[#a78bfa] ring-0 ring-offset-2 ring-offset-surface-container transition-all" title="Violet"></button>
+                                <button data-accent="amber" class="accent-btn w-7 h-7 rounded-full bg-[#fbbf24] ring-0 ring-offset-2 ring-offset-surface-container transition-all" title="Amber"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- About -->
+                    <div class="bg-surface-container-high rounded-xl p-4 flex items-start gap-3">
+                        <span class="material-symbols-outlined text-primary-container mt-0.5">info</span>
+                        <div>
+                            <p class="text-label-md font-medium text-on-surface">CarbonPulse Intelligence v1.0</p>
+                            <p class="text-label-sm text-on-surface-variant mt-1">India CEA 2024 emission factors &bull; ISO 14064 aligned &bull; Real-time fleet telemetry</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 pb-5">
+                    <button id="btn-save-settings" class="w-full bg-primary-container text-on-primary-container font-bold py-3 rounded-lg hover:opacity-90 transition-all active:scale-95">Save Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Page Container -->
+        <div id="main-container" class="p-margin-page flex-1">
+            
+            <!-- ─── VIEW 1: DASHBOARD (Active by default) ─── -->
+            <div id="view-dashboard" class="space-y-stack-lg">
+                <section class="grid grid-cols-1 md:grid-cols-5 gap-gutter">
+                    <!-- Card 1 -->
+                    <div class="glass-card p-4 md:p-5 rounded-xl flex flex-col gap-2">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">EV Fleet Penetration</span>
+                        <div class="flex flex-wrap items-baseline gap-x-1 mt-auto">
+                            <span id="kpi-ev-penetration" class="text-headline-lg font-headline-lg">--</span>
+                            <span class="text-label-sm font-label-sm text-on-surface-variant">%</span>
+                        </div>
+                        <div class="h-1 w-full bg-surface-variant rounded-full mt-4 overflow-hidden">
+                            <div id="kpi-ev-penetration-bar" class="h-full bg-primary-container w-[0%] transition-all duration-1000"></div>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="glass-card p-4 md:p-5 rounded-xl flex flex-col gap-2">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Scope 1 Emissions YTD</span>
+                        <div class="flex flex-wrap items-baseline gap-x-1 mt-auto">
+                            <span id="kpi-scope1" class="text-headline-lg font-headline-lg">--</span>
+                            <span class="text-label-sm font-label-sm text-on-surface-variant">tCO2e</span>
+                        </div>
+                        <span class="text-label-sm font-label-sm text-error flex items-center gap-1 mt-2">
+                            <span class="material-symbols-outlined text-[14px]">trending_up</span> direct fleet diesel
+                        </span>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="glass-card p-4 md:p-5 rounded-xl flex flex-col gap-2">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Scope 3 Emissions YTD</span>
+                        <div class="flex flex-wrap items-baseline gap-x-1 mt-auto">
+                            <span id="kpi-scope3" class="text-headline-lg font-headline-lg">--</span>
+                            <span class="text-label-sm font-label-sm text-on-surface-variant">tCO2e</span>
+                        </div>
+                        <span class="text-label-sm font-label-sm text-primary-container flex items-center gap-1 mt-2">
+                            <span class="material-symbols-outlined text-[14px]">trending_down</span> upstream supply chain
+                        </span>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="glass-card p-4 md:p-5 rounded-xl border-primary-container/20 flex flex-col gap-2">
+                        <span class="text-label-sm font-label-sm text-primary-container uppercase tracking-wider font-bold">CO2 Avoided by EVs</span>
+                        <div class="flex flex-wrap items-baseline gap-x-1 mt-auto">
+                            <span id="kpi-avoided" class="text-headline-lg font-headline-lg text-primary-container neon-glow">--</span>
+                            <span class="text-label-sm font-label-sm text-primary-container/70">tCO2e</span>
+                        </div>
+                        <span class="text-label-sm font-label-sm text-primary-container flex items-center gap-1 mt-2">
+                            <span class="material-symbols-outlined text-[14px]">eco</span> clean energy impact
+                        </span>
+                    </div>
+                    <!-- Card 5 -->
+                    <div class="glass-card p-4 md:p-5 rounded-xl flex flex-col gap-2">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Net Zero Progress</span>
+                        <div class="flex flex-wrap items-baseline gap-x-1 mt-auto">
+                            <span id="kpi-netzero" class="text-headline-lg font-headline-lg">--</span>
+                            <span class="text-label-sm font-label-sm text-on-surface-variant">%</span>
+                        </div>
+                        <div class="h-1 w-full bg-surface-variant rounded-full mt-4 overflow-hidden">
+                            <div id="kpi-netzero-bar" class="h-full bg-primary-container w-[0%] transition-all duration-1000"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Middle Section: Main Chart -->
+                <section class="glass-card rounded-2xl overflow-hidden p-8 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-headline-md font-headline-md">Emissions Projection Model</h3>
+                            <p class="text-body-md text-on-surface-variant">Comparative analysis of direct and indirect emissions vs corporate roadmap trajectory</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-label-sm text-on-surface-variant font-medium">Filter Fleet:</span>
+                            <select id="dashboard-fleet-filter" class="bg-surface-variant/40 border border-white/10 rounded-lg text-label-md px-3 py-1.5 focus:ring-1 focus:ring-primary-container focus:border-primary-container text-on-surface outline-none">
+                                <option value="all">All Fleets Combined</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="h-[380px] w-full relative">
+                        <canvas id="dashboard-emissions-chart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Bottom Section -->
+                <section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+                    <!-- Circular Journey -->
+                    <div class="md:col-span-4 glass-card p-8 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <h4 class="text-headline-md font-headline-md mb-8">Net Zero Journey</h4>
+                        <div class="relative w-48 h-48">
+                            <svg class="w-full h-full -rotate-90" viewbox="0 0 100 100">
+                                <circle cx="50" cy="50" fill="none" r="40" stroke="#30363D" stroke-width="10"></circle>
+                                <circle id="donut-progress-ring" cx="50" cy="50" fill="none" r="40" stroke="#00FF87" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" stroke-width="10" class="transition-all duration-1000"></circle>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="donut-percentage" class="text-display-lg font-display-lg text-primary-container">--%</span>
+                                <span class="text-label-sm font-label-sm text-on-surface-variant">REDUCTION</span>
+                            </div>
+                        </div>
+                        <div class="mt-8 space-y-2">
+                            <p class="text-body-md font-medium">Target Roadmap Pathway</p>
+                            <p id="donut-roadmap-label" class="text-label-sm text-on-surface-variant">Active monitoring against target year</p>
+                        </div>
+                    </div>
+                    <!-- Operational Alerts Table -->
+                    <div class="md:col-span-8 glass-card rounded-2xl overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                            <h4 class="text-headline-md font-headline-md">High-Emission Route Alerts</h4>
+                            <span class="px-3 py-1 rounded-full bg-error-container/20 text-error border border-error/20 text-label-sm font-bold flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-error animate-pulse"></span> Action Required
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="text-label-sm font-label-sm text-on-surface-variant uppercase bg-white/5 border-b border-white/10">
+                                    <tr>
+                                        <th class="px-6 py-4">Route Name</th>
+                                        <th class="px-6 py-4 text-right">Distance</th>
+                                        <th class="px-6 py-4 text-right">Monthly CO2</th>
+                                        <th class="px-6 py-4 text-right">Saving Potential</th>
+                                        <th class="px-6 py-4 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-alerts-tbody" class="divide-y divide-white/5">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant">Loading operational alerts...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ─── VIEW 2: EMISSIONS INTELLIGENCE (Hidden by default) ─── -->
+            <div id="view-emissions" class="space-y-stack-lg hidden">
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+                    <!-- YoY Stat Card 1 -->
+                    <div class="glass-card p-6 rounded-xl border-l-4 border-[#FF4D4D]">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Scope 1 YoY Delta</span>
+                        <div class="text-headline-lg font-headline-lg mt-2 text-[#FF4D4D]">-18.2%</div>
+                        <p class="text-label-sm text-on-surface-variant mt-2">Decreased direct emissions from diesel conversion</p>
+                    </div>
+                    <!-- YoY Stat Card 2 -->
+                    <div class="glass-card p-6 rounded-xl border-l-4 border-[#FFB347]">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant uppercase">Scope 3 YoY Delta</span>
+                        <div class="text-headline-lg font-headline-lg mt-2 text-[#FFB347]">-11.4%</div>
+                        <p class="text-label-sm text-on-surface-variant mt-2">Upstream footprint reduction via suppliers</p>
+                    </div>
+                    <!-- YoY Stat Card 3 -->
+                    <div class="glass-card p-6 rounded-xl border-l-4 border-primary-container">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant uppercase">EV Offset Growth</span>
+                        <div class="text-headline-lg font-headline-lg mt-2 text-primary-container">+34.7%</div>
+                        <p class="text-label-sm text-on-surface-variant mt-2">Avoided carbon from electrified logistics routes</p>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+                    <!-- Historical Area Chart -->
+                    <div class="md:col-span-8 glass-card p-8 rounded-2xl space-y-6">
+                        <h4 class="text-headline-md font-headline-md">Monthly Emissions breakdown (Scope 1 vs 3)</h4>
+                        <div class="h-[340px]">
+                            <canvas id="emissions-breakdown-chart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Commitments Progress List -->
+                    <div class="md:col-span-4 glass-card p-6 rounded-2xl flex flex-col">
+                        <h4 class="text-headline-md font-headline-md mb-4 border-b border-white/5 pb-3">Net Zero Commitments</h4>
+                        <div id="commitments-container" class="space-y-4 flex-1 overflow-y-auto max-h-[340px] pr-2">
+                            <!-- Items loaded dynamically -->
+                            <div class="text-center text-on-surface-variant py-12">Loading commitments...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Asset Class Carbon breakdown -->
+                <section class="glass-card p-8 rounded-2xl space-y-6">
+                    <h4 class="text-headline-md font-headline-md">Carbon Footprint by Asset Class (2025 YTD)</h4>
+                    <div class="h-[280px]">
+                        <canvas id="emissions-asset-chart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Battery Supply Chain Risk -->
+                <section class="glass-card p-8 rounded-2xl space-y-6">
+                    <h4 class="text-headline-md font-headline-md">Battery Supply Chain Risk & Traceability</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-white/10 text-on-surface-variant text-label-sm uppercase tracking-wider">
+                                    <th class="py-3 px-4 font-semibold">Supplier</th>
+                                    <th class="py-3 px-4 font-semibold">Material</th>
+                                    <th class="py-3 px-4 font-semibold">Country</th>
+                                    <th class="py-3 px-4 font-semibold text-center">Risk Score</th>
+                                    <th class="py-3 px-4 font-semibold">Carbon Intensity</th>
+                                    <th class="py-3 px-4 font-semibold">Supply Concentration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppliers-table-body" class="text-body-md divide-y divide-white/5">
+                                <tr>
+                                    <td colspan="6" class="text-center py-6 text-on-surface-variant">Loading supply chain risk data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ─── VIEW 3: GEOSPATIAL ROUTE MAP (Hidden by default) ─── -->
+            <div id="view-map" class="grid grid-cols-1 md:grid-cols-12 gap-gutter hidden h-[calc(100vh-120px)] overflow-hidden">
+                <!-- Map Left Container -->
+                <div class="md:col-span-8 flex flex-col relative h-full glass-card rounded-2xl overflow-hidden border border-white/10">
+                    <div class="absolute top-4 left-4 z-[1000] flex gap-2">
+                        <button id="map-filter-all" class="px-4 py-2 rounded-full bg-primary-container text-on-primary-container font-bold text-label-sm shadow-lg border border-primary-container/20 transition-all hover:scale-105 active:scale-95">All Routes</button>
+                        <button id="map-filter-diesel" class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface font-medium text-label-sm shadow-lg border border-white/10 transition-all hover:bg-white/5 hover:scale-105 active:scale-95">⛽ Diesel Only</button>
+                        <button id="map-filter-ev" class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface font-medium text-label-sm shadow-lg border border-white/10 transition-all hover:bg-white/5 hover:scale-105 active:scale-95">⚡ Electrified</button>
+                    </div>
+                    <!-- Legend floating -->
+                    <div class="absolute bottom-4 left-4 z-[1000] glass-card p-3 rounded-lg text-label-sm flex flex-col gap-1 border border-white/10 shadow-lg text-[12px] bg-background/85">
+                        <div class="flex items-center gap-2"><span class="w-3 h-1.5 rounded-full bg-[#FF4D4D]"></span> High Emission Diesel (>150t)</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-1.5 rounded-full bg-[#FFB347]"></span> Mid Emission Diesel (50-150t)</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-1.5 rounded-full bg-[#00FF87]"></span> Electrified EV Route (<20t)</div>
+                    </div>
+                    <!-- Leaflet Div -->
+                    <div id="leaflet-map" class="w-full h-full"></div>
+                </div>
+                <!-- Map Right Sidebar -->
+                <div class="md:col-span-4 glass-card rounded-2xl flex flex-col h-full overflow-hidden">
+                    <div class="p-6 border-b border-white/5 bg-white/[0.01]">
+                        <h4 class="text-headline-md font-headline-md">Top Carbon-Emitting Routes</h4>
+                        <p class="text-label-sm font-label-sm text-on-surface-variant mt-1">High-impact conversion targets</p>
+                    </div>
+                    <div id="map-routes-list" class="flex-1 overflow-y-auto p-4 space-y-4">
+                        <!-- Loaded dynamically -->
+                        <div class="text-center text-on-surface-variant py-12">Loading routes details...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── VIEW 4: AI CARBON ADVISOR (Hidden by default) ─── -->
+            <div id="view-ai" class="grid grid-cols-1 md:grid-cols-12 gap-gutter hidden h-[calc(100vh-120px)] overflow-hidden">
+                <!-- Chat Window (Left) -->
+                <div class="md:col-span-7 flex flex-col h-full glass-card rounded-2xl overflow-hidden">
+                    <!-- Chat Header -->
+                    <div class="p-5 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center border border-primary-container/30">
+                                <span class="material-symbols-outlined text-primary-container">psychology</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-on-surface">🌿 Net Zero AI Advisor</h4>
+                                <div class="flex items-center gap-1.5">
+                                    <span id="ai-engine-dot" class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+                                    <span id="ai-engine-badge" class="text-[12px] text-primary-container font-semibold">Active Engine</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btn-clear-chat" class="text-label-sm font-bold text-on-surface-variant hover:text-white transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[18px]">delete</span> Clear History
+                        </button>
+                    </div>
+                    
+                    <!-- Chat Output -->
+                    <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4">
+                        <!-- Bot Message -->
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-primary-container/20 border border-primary-container/30 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary-container text-[18px]">psychology</span>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl rounded-tl-none max-w-[85%] text-on-surface border border-white/5 space-y-2">
+                                <p class="font-medium text-primary-container">Welcome to CarbonPulse AI Agent!</p>
+                                <p>I analyze real-time fleet telematics, Scope 1 and Scope 3 emissions, and geospatial routes to identify carbon-reduction pathways.</p>
+                                <p class="text-label-sm text-on-surface-variant mt-2">💡 Try asking:</p>
+                                <ul class="list-disc pl-4 text-label-sm text-on-surface-variant space-y-1">
+                                    <li>"What are our Scope 1 and Scope 3 emissions YTD?"</li>
+                                    <li>"Which fleets have the highest carbon impact and what do you recommend?"</li>
+                                    <li>"Explain the difference between Scope 1 and Scope 3 emissions."</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="p-4 border-t border-white/5 bg-background/50">
+                        <form id="chat-form" class="flex gap-3">
+                            <input id="chat-input" type="text" class="flex-1 bg-surface-variant/20 border border-white/10 rounded-xl px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-container focus:border-primary-container outline-none" placeholder="Ask about emissions metrics, targets, policies..."/>
+                            <button type="submit" class="bg-primary-container text-on-primary-container hover:opacity-90 font-bold px-5 rounded-xl transition-all active:scale-95 flex items-center justify-center">
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Priority Recommendations (Right) -->
+                <div class="md:col-span-5 flex flex-col h-full overflow-hidden glass-card rounded-2xl">
+                    <div class="p-6 border-b border-white/5 bg-white/[0.01]">
+                        <h4 class="text-headline-md font-headline-md text-primary-container flex items-center gap-2">
+                            <span class="material-symbols-outlined">electric_bolt</span> AI Electrification Priorities
+                        </h4>
+                        <p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Ranked by combined carbon impact & operational readiness</p>
+                    </div>
+                    <div id="ai-priorities-list" class="flex-1 overflow-y-auto p-4 space-y-4">
+                        <!-- Loaded dynamically -->
+                        <div class="text-center text-on-surface-variant py-12">Calculating priority ranks...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Interactive script and API links -->
+    <script>
+        const API_BASE = (location.protocol === "file:") 
+            ? "http://localhost:8000/api" 
+            : location.origin + "/api";
+        let activeTab = "dashboard";
+        
+        // Navigation links
+        const navBtns = {
+            dashboard: document.getElementById("nav-dashboard"),
+            emissions: document.getElementById("nav-emissions"),
+            map: document.getElementById("nav-map"),
+            ai: document.getElementById("nav-ai")
+        };
+
+        // Views divs
+        const viewDivs = {
+            dashboard: document.getElementById("view-dashboard"),
+            emissions: document.getElementById("view-emissions"),
+            map: document.getElementById("view-map"),
+            ai: document.getElementById("view-ai")
+        };
+
+        // Screen names mapping for title
+        const screenTitles = {
+            dashboard: "CarbonPulse Intelligence Dashboard",
+            emissions: "Emissions Carbon Intelligence",
+            map: "Geospatial Carbon Route Map",
+            ai: "Net Zero AI Advisor"
+        };
+
+        // Charts handles
+        let dbEmissionsChart = null;
+        let emBreakdownChart = null;
+        let emAssetChart = null;
+        let leafletMap = null;
+        let mapPolyLines = [];
+        let chatHistory = [];
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            // Update Title
+            document.getElementById("page-title").textContent = screenTitles[tabName];
+
+            // Toggles
+            Object.keys(navBtns).forEach(k => {
+                if (k === tabName) {
+                    navBtns[k].className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-primary-container font-bold border-r-2 border-primary-container bg-white/5 transition-colors";
+                    navBtns[k].querySelector(".material-symbols-outlined").style.fontVariationSettings = "'FILL' 1, 'wght' 400";
+                    viewDivs[k].classList.remove("hidden");
+                } else {
+                    navBtns[k].className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant font-medium hover:bg-white/5 hover:text-primary-fixed-dim transition-colors";
+                    navBtns[k].querySelector(".material-symbols-outlined").style.fontVariationSettings = "'FILL' 0, 'wght' 400";
+                    viewDivs[k].classList.add("hidden");
+                }
+            });
+
+            // Trigger data fetch / rendering
+            if (tabName === "dashboard") {
+                loadDashboardData();
+            } else if (tabName === "emissions") {
+                loadEmissionsData();
+            } else if (tabName === "map") {
+                setTimeout(initRouteMap, 100);
+            } else if (tabName === "ai") {
+                loadAIPriorities();
+            }
+        }
+
+        // Attach Nav events
+        Object.keys(navBtns).forEach(k => {
+            navBtns[k].addEventListener("click", () => switchTab(k));
+        });
+
+        // ─── DASHBOARD CODE ───
+        async function loadDashboardData() {
+            try {
+                const kpiResp = await fetch(`${API_BASE}/dashboard`);
+                const kpis = await kpiResp.json();
+                
+                document.getElementById("kpi-ev-penetration").textContent = kpis.ev_penetration_pct;
+                document.getElementById("kpi-ev-penetration-bar").style.width = `${kpis.ev_penetration_pct}%`;
+                
+                document.getElementById("kpi-scope1").textContent = Number(kpis.scope1_ytd_tons).toLocaleString();
+                document.getElementById("kpi-scope3").textContent = Number(kpis.scope3_ytd_tons).toLocaleString();
+                document.getElementById("kpi-avoided").textContent = Number(kpis.ev_avoided_ytd_tons).toLocaleString();
+                
+                document.getElementById("kpi-netzero").textContent = kpis.net_zero_progress_pct;
+                document.getElementById("kpi-netzero-bar").style.width = `${kpis.net_zero_progress_pct}%`;
+
+                // Update Donut Journey
+                document.getElementById("donut-percentage").textContent = `${kpis.net_zero_progress_pct}%`;
+                const progressOffset = 251.2 - (251.2 * (kpis.net_zero_progress_pct / 100));
+                document.getElementById("donut-progress-ring").style.strokeDashoffset = progressOffset;
+                document.getElementById("donut-roadmap-label").textContent = `Avoided offsets match ${kpis.carbon_saved_vs_target_pct}% of direct fuel carbon`;
+
+                // Load Fleet list for filter dropdown if empty
+                const fleetFilter = document.getElementById("dashboard-fleet-filter");
+                if (fleetFilter.options.length === 1) {
+                    const fleetResp = await fetch(`${API_BASE}/fleet`);
+                    const fleets = await fleetResp.json();
+                    fleets.forEach(f => {
+                        const opt = document.createElement("option");
+                        opt.value = f.id;
+                        opt.textContent = f.name;
+                        fleetFilter.appendChild(opt);
+                    });
+                }
+
+                // Render emissions line chart
+                await updateDashboardChart(fleetFilter.value === "all" ? null : fleetFilter.value);
+
+                // Operational carbon alerts
+                const alertsResp = await fetch(`${API_BASE}/routes/top-emitters?limit=5`);
+                const alerts = await alertsResp.json();
+                const tbody = document.getElementById("dashboard-alerts-tbody");
+                tbody.innerHTML = "";
+
+                if (alerts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">No critical emissions flags.</td></tr>`;
+                } else {
+                    alerts.forEach(r => {
+                        const tr = document.createElement("tr");
+                        tr.className = "hover:bg-white/5 transition-colors";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 flex items-center gap-3">
+                                <div class="w-2 h-10 ${r.monthly_co2_tons > 150 ? 'bg-[#FF4D4D]' : 'bg-[#FFB347]'} rounded-full"></div>
+                                <div>
+                                    <div class="font-bold text-on-surface">${r.name}</div>
+                                    <div class="text-[12px] text-on-surface-variant">Diesel Freight Corridor</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right mono-data">${r.distance_km} km</td>
+                            <td class="px-6 py-4 text-right text-error font-bold font-mono">${r.monthly_co2_tons} t</td>
+                            <td class="px-6 py-4 text-right text-primary-container font-semibold font-mono">-${r.potential_saving_tons} t</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 rounded-full ${r.monthly_co2_tons > 150 ? 'bg-error-container/30 text-error' : 'bg-secondary-container/30 text-secondary'} text-label-sm border ${r.monthly_co2_tons > 150 ? 'border-error/20' : 'border-white/10'}">
+                                    ${r.monthly_co2_tons > 150 ? 'Critical Spike' : 'Attention'}
+                                </span>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.error("Dashboard error:", err);
+            }
+        }
+
+        async function updateDashboardChart(fleetId) {
+            try {
+                let url = `${API_BASE}/emissions/timeseries`;
+                if (fleetId) url += `?fleet_id=${fleetId}`;
+                
+                const resp = await fetch(url);
+                const data = await resp.json();
+
+                const labels = data.map(d => d.label);
+                const scope1 = data.map(d => d.scope1_tons);
+                const scope3 = data.map(d => d.scope3_tons);
+                const target = data.map(d => d.target_tons);
+
+                if (dbEmissionsChart) {
+                    dbEmissionsChart.destroy();
+                }
+
+                const ctx = document.getElementById("dashboard-emissions-chart").getContext("2d");
+                dbEmissionsChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: "Scope 1 (Direct)",
+                                data: scope1,
+                                borderColor: "#FF4D4D",
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.3
+                            },
+                            {
+                                label: "Scope 3 (Upstream)",
+                                data: scope3,
+                                borderColor: "#FFB347",
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.3
+                            },
+                            {
+                                label: "SBTi Trajectory",
+                                data: target,
+                                borderColor: "#00FF87",
+                                borderWidth: 2,
+                                borderDash: [6, 4],
+                                fill: false,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: "rgba(22, 27, 34, 0.95)",
+                                titleColor: "#dfe2eb",
+                                bodyColor: "#dfe2eb",
+                                borderColor: "rgba(255,255,255,0.1)",
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: "rgba(255, 255, 255, 0.05)"
+                                },
+                                ticks: {
+                                    color: "#b9cbb9"
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: "rgba(255, 255, 255, 0.05)"
+                                },
+                                ticks: {
+                                    color: "#b9cbb9"
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("Dashboard chart error:", err);
+            }
+        }
+
+        // Attach dropdown change event
+        document.getElementById("dashboard-fleet-filter").addEventListener("change", (e) => {
+            updateDashboardChart(e.target.value === "all" ? null : e.target.value);
+        });
+
+
+        // ─── EMISSIONS INTELLIGENCE CODE ───
+        async function loadEmissionsData() {
+            try {
+                // Stacked Area Chart (emissions timeseries)
+                const tsResp = await fetch(`${API_BASE}/emissions/timeseries`);
+                const tsData = await tsResp.json();
+                
+                const labels = tsData.map(d => d.label);
+                const scope1 = tsData.map(d => d.scope1_tons);
+                const scope3 = tsData.map(d => d.scope3_tons);
+                const avoided = tsData.map(d => d.ev_avoided_tons);
+
+                if (emBreakdownChart) emBreakdownChart.destroy();
+                
+                const ctx = document.getElementById("emissions-breakdown-chart").getContext("2d");
+                emBreakdownChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: "Scope 1 (Direct)",
+                                data: scope1,
+                                backgroundColor: "rgba(255, 77, 77, 0.35)",
+                                borderColor: "#FF4D4D",
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3
+                            },
+                            {
+                                label: "Scope 3 (Indirect)",
+                                data: scope3,
+                                backgroundColor: "rgba(255, 179, 71, 0.25)",
+                                borderColor: "#FFB347",
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3
+                            },
+                            {
+                                label: "Avoided by EV Offset",
+                                data: avoided,
+                                backgroundColor: "rgba(0, 255, 135, 0.15)",
+                                borderColor: "#00FF87",
+                                borderWidth: 2,
+                                borderDash: [4, 4],
+                                fill: false,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: "#dfe2eb" }
+                            }
+                        },
+                        scales: {
+                            x: { grid: { color: "rgba(255, 255, 255, 0.05)" }, ticks: { color: "#b9cbb9" } },
+                            y: { grid: { color: "rgba(255, 255, 255, 0.05)" }, ticks: { color: "#b9cbb9" } }
+                        }
+                    }
+                });
+
+                // Asset Class Emissions Bar Chart
+                const assetResp = await fetch(`${API_BASE}/emissions/by-asset-class?year=2025`);
+                const assetData = await assetResp.json();
+                
+                const assetLabels = assetData.map(d => d.asset_class.toUpperCase());
+                const assetS1 = assetData.map(d => d.scope1_tons);
+                const assetS3 = assetData.map(d => d.scope3_tons);
+
+                if (emAssetChart) emAssetChart.destroy();
+                
+                const ctxAsset = document.getElementById("emissions-asset-chart").getContext("2d");
+                emAssetChart = new Chart(ctxAsset, {
+                    type: "bar",
+                    data: {
+                        labels: assetLabels,
+                        datasets: [
+                            {
+                                label: "Scope 1 (tCO2e)",
+                                data: assetS1,
+                                backgroundColor: "#FF4D4D"
+                            },
+                            {
+                                label: "Scope 3 (tCO2e)",
+                                data: assetS3,
+                                backgroundColor: "#FFB347"
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: "#dfe2eb" } }
+                        },
+                        scales: {
+                            x: { stacked: true, grid: { display: false }, ticks: { color: "#b9cbb9" } },
+                            y: { stacked: true, grid: { color: "rgba(255, 255, 255, 0.05)" }, ticks: { color: "#b9cbb9" } }
+                        }
+                    }
+                });
+
+                // Load Commitments List
+                const commitResp = await fetch(`${API_BASE}/commitments`);
+                const commitments = await commitResp.json();
+                
+                const container = document.getElementById("commitments-container");
+                container.innerHTML = "";
+                
+                commitments.forEach(c => {
+                    const pct = Math.round(c.current_reduction_pct * 100);
+                    let statusColor = "text-[#FFD166] bg-[#FFD166]/10 border-[#FFD166]/20";
+                    if (c.status === "on_track") statusColor = "text-[#00FF87] bg-[#00FF87]/10 border-[#00FF87]/20";
+                    if (c.status === "off_track") statusColor = "text-[#FF6B6B] bg-[#FF6B6B]/10 border-[#FF6B6B]/20";
+
+                    const div = document.createElement("div");
+                    div.className = "p-4 glass-card rounded-xl space-y-3 border border-white/5";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h5 class="font-bold text-on-surface text-[15px]">${c.organization}</h5>
+                                <span class="text-[12px] text-on-surface-variant">Target Year: ${c.target_year} | Base Year: ${c.baseline_year}</span>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase border ${statusColor}">
+                                ${c.status.replace("_", " ")}
+                            </span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-label-sm font-semibold">
+                                <span>Roadmap Progress</span>
+                                <span class="text-primary-container">${pct}%</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+                                <div class="h-full bg-primary-container" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+
+                // Load Suppliers List (Battery Supply Chain Risk)
+                const supplierResp = await fetch(`${API_BASE}/suppliers`);
+                const suppliers = await supplierResp.json();
+                
+                const tableBody = document.getElementById("suppliers-table-body");
+                tableBody.innerHTML = "";
+                
+                suppliers.forEach(s => {
+                    let badgeColor = "text-[#00FF87] bg-[#00FF87]/10 border-[#00FF87]/20"; // green (<40)
+                    if (s.risk_score >= 40 && s.risk_score <= 70) {
+                        badgeColor = "text-[#FFB347] bg-[#FFB347]/10 border-[#FFB347]/20"; // amber (40-70)
+                    } else if (s.risk_score > 70) {
+                        badgeColor = "text-[#FF4D4D] bg-[#FF4D4D]/10 border-[#FF4D4D]/20"; // red (>70)
+                    }
+                    
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-white/[0.02] transition-colors";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-bold text-on-surface">${s.name}</td>
+                        <td class="py-3 px-4 text-on-surface-variant">${s.material}</td>
+                        <td class="py-3 px-4 text-on-surface-variant">${s.country}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${badgeColor}">
+                                ${s.risk_score.toFixed(1)}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-on-surface">${s.carbon_intensity.toFixed(1)} <span class="text-on-surface-variant text-[11px]">kg CO2/kg</span></td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[12px] font-semibold text-primary-container w-8 text-right">${Math.round(s.concentration_pct)}%</span>
+                                <div class="h-1.5 w-24 bg-surface-variant rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary-container" style="width: ${s.concentration_pct}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+            } catch (err) {
+                console.error("Emissions Intelligence error:", err);
+            }
+        }
+
+
+        // ─── GEOSPATIAL MAP CODE ───
+        async function initRouteMap() {
+            if (leafletMap) return; // Already initialized
+
+            // Center on middle of India
+            leafletMap = L.map('leaflet-map').setView([22.0, 78.0], 5);
+
+            // Dark Mode CartoDB tiles
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(leafletMap);
+
+            loadMapRoutes("all");
+        }
+
+        async function loadMapRoutes(filter) {
+            try {
+                // Clear existing lines/markers
+                mapPolyLines.forEach(l => leafletMap.removeLayer(l));
+                mapPolyLines = [];
+
+                // Fetch routes
+                let url = `${API_BASE}/routes`;
+                const resp = await fetch(url);
+                const routes = await resp.json();
+
+                const filtered = routes.filter(r => {
+                    if (filter === "diesel") return !r.is_electrified;
+                    if (filter === "ev") return r.is_electrified;
+                    return true;
+                });
+                filtered.sort((a, b) => b.monthly_co2_tons - a.monthly_co2_tons);
+
+                // Update routes side list
+                const listContainer = document.getElementById("map-routes-list");
+                listContainer.innerHTML = "";
+
+                // Populate lines and markers
+                const cityCoordinates = {};
+
+                filtered.forEach(r => {
+                    // Collect coordinates for markers
+                    cityCoordinates[r.origin_city] = [r.origin_lat, r.origin_lon];
+                    cityCoordinates[r.dest_city] = [r.dest_lat, r.dest_lon];
+
+                    // Draw line
+                    let color = "#00FF87"; // EV
+                    if (!r.is_electrified) {
+                        color = r.monthly_co2_tons > 150 ? "#FF4D4D" : "#FFB347";
+                    }
+
+                    const start = [r.origin_lat, r.origin_lon];
+                    const end = [r.dest_lat, r.dest_lon];
+
+                    // Add a tiny curve midpoint to make a nice arc
+                    const latlngs = [start, end];
+
+                    const line = L.polyline(latlngs, {
+                        color: color,
+                        weight: r.is_electrified ? 3 : 4,
+                        opacity: 0.85,
+                        dashArray: r.is_electrified ? null : "6, 4"
+                    }).addTo(leafletMap);
+
+                    line.bindPopup(`
+                        <div class="text-on-surface bg-[#10141a] p-3 rounded-lg border border-white/10 space-y-1.5 min-w-[200px]" style="color:#dfe2eb">
+                            <div class="font-bold border-b border-white/10 pb-1 text-primary-container">${r.name}</div>
+                            <div class="text-label-sm">Distance: <span class="font-mono text-white">${r.distance_km} km</span></div>
+                            <div class="text-label-sm">Type: <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${r.is_electrified ? 'bg-primary-container/20 text-primary-container' : 'bg-error-container/30 text-error'}">${r.vehicle_type}</span></div>
+                            <div class="text-label-sm">Monthly CO₂: <span class="font-mono text-error font-bold">${r.monthly_co2_tons} t</span></div>
+                            <div class="text-label-sm">EV Avoided: <span class="font-mono text-primary-container font-bold">${r.potential_saving_tons} t</span></div>
+                        </div>
+                    `, { closeButton: false });
+
+                    mapPolyLines.push(line);
+
+                    // Add to right side-panel
+                    const div = document.createElement("div");
+                    div.className = "p-4 glass-card rounded-xl border border-white/5 flex flex-col gap-2 cursor-pointer hover:border-primary-container/30 transition-all";
+                    
+                    if (r.is_electrified) {
+                        div.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <span class="font-bold text-on-surface text-[15px]">${r.name}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/20 text-primary-container uppercase border border-primary-container/30 font-mono">ELECTRIFIED</span>
+                            </div>
+                            <div class="flex justify-between items-baseline mt-1">
+                                <span class="text-label-sm text-on-surface-variant">Monthly Footprint:</span>
+                                <span class="font-mono font-bold text-primary-container text-[16px]">${r.monthly_co2_tons} tCO2</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-[12px] text-primary-container font-semibold">Avoided Carbon Offset:</span>
+                                <span class="font-mono text-primary-container font-bold text-[14px]">-${r.potential_saving_tons} t</span>
+                            </div>
+                        `;
+                    } else {
+                        div.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <span class="font-bold text-on-surface text-[15px]">${r.name}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FF4D4D]/15 text-[#FF4D4D] uppercase border border-[#FF4D4D]/25 font-mono">DIESEL</span>
+                            </div>
+                            <div class="flex justify-between items-baseline mt-1">
+                                <span class="text-label-sm text-on-surface-variant">Monthly Footprint:</span>
+                                <span class="font-mono font-bold text-error text-[16px]">${r.monthly_co2_tons} tCO2</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-[12px] text-primary-container font-semibold">Avoidance Saving Potential:</span>
+                                <span class="font-mono text-primary-container font-bold text-[14px]">-${r.potential_saving_tons} t</span>
+                            </div>
+                        `;
+                    }
+                    div.addEventListener("click", () => {
+                        leafletMap.setView(start, 7);
+                        line.openPopup();
+                    });
+                    listContainer.appendChild(div);
+                });
+
+                // Add glowing markers for all unique cities
+                Object.keys(cityCoordinates).forEach(cityName => {
+                    const coords = cityCoordinates[cityName];
+                    
+                    const circle = L.circleMarker(coords, {
+                        radius: 6,
+                        fillColor: '#00FF87',
+                        fillOpacity: 1,
+                        color: '#0D1117',
+                        weight: 2
+                    }).addTo(leafletMap);
+
+                    circle.bindTooltip(`<span class="font-bold text-[12px]">${cityName}</span>`, {
+                        permanent: false,
+                        direction: 'top'
+                    });
+
+                    mapPolyLines.push(circle);
+                });
+
+                if (listContainer.innerHTML === "") {
+                    listContainer.innerHTML = `<div class="text-center text-on-surface-variant py-12">No high-emission routes matches filter.</div>`;
+                }
+
+            } catch (err) {
+                console.error("Map routes error:", err);
+            }
+        }
+
+        // Map Filters click events
+        document.getElementById("map-filter-all").addEventListener("click", (e) => {
+            setMapFilterClass(e.target);
+            loadMapRoutes("all");
+        });
+        document.getElementById("map-filter-diesel").addEventListener("click", (e) => {
+            setMapFilterClass(e.target);
+            loadMapRoutes("diesel");
+        });
+        document.getElementById("map-filter-ev").addEventListener("click", (e) => {
+            setMapFilterClass(e.target);
+            loadMapRoutes("ev");
+        });
+
+        function setMapFilterClass(activeBtn) {
+            const btns = [document.getElementById("map-filter-all"), document.getElementById("map-filter-diesel"), document.getElementById("map-filter-ev")];
+            btns.forEach(b => {
+                if (b === activeBtn) {
+                    b.className = "px-4 py-2 rounded-full bg-primary-container text-on-primary-container font-bold text-label-sm shadow-lg border border-primary-container/20 transition-all";
+                } else {
+                    b.className = "px-4 py-2 rounded-full bg-surface-container-high text-on-surface font-medium text-label-sm shadow-lg border border-white/10 transition-all hover:bg-white/5";
+                }
+            });
+        }
+
+
+        // ─── AI CARBON ADVISOR CODE ───
+        async function loadAIPriorities() {
+            try {
+                const resp = await fetch(`${API_BASE}/ai/priorities`);
+                const data = await resp.json();
+
+                const container = document.getElementById("ai-priorities-list");
+                container.innerHTML = "";
+
+                data.forEach(p => {
+                    let scoreColor = "bg-[#FF4D4D]"; // Critical
+                    if (p.impact_score > 75) scoreColor = "bg-primary-container shadow-[0_0_8px_rgba(0,255,135,0.4)]";
+                    else if (p.impact_score > 40) scoreColor = "bg-[#FFB347]";
+
+                    const div = document.createElement("div");
+                    div.className = "p-4 glass-card rounded-xl border border-white/5 flex flex-col gap-3 hover:border-primary-container/30 transition-all group";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-label-sm font-bold text-primary-container font-mono">#${p.rank}</span>
+                                <h5 class="font-bold text-on-surface text-[15px] group-hover:text-primary-container transition-colors">${p.fleet_name}</h5>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold font-mono text-on-surface-variant bg-surface-variant/40">${p.asset_class}</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-label-sm font-semibold">
+                                <span>Transition Impact Score</span>
+                                <span class="font-mono text-primary-container">${p.impact_score}/100</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+                                <div class="h-full ${scoreColor}" style="width: ${p.impact_score}%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-1 text-[12px] text-on-surface-variant border-t border-white/5">
+                            <span>CO₂ Saving: <strong class="text-primary-container font-mono">${p.potential_saving_tons} t/yr</strong></span>
+                            <span class="font-mono">Readiness: ${p.readiness_index}</span>
+                        </div>
+                        <p class="text-[12px] text-primary-container bg-primary-container/5 border border-primary-container/10 p-2.5 rounded-lg leading-relaxed mt-1">
+                            <strong>AI Recommendation:</strong> ${p.recommendation}
+                        </p>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error("AI priorities error:", err);
+            }
+        }
+
+        // Chat Form submit logic
+        const chatForm = document.getElementById("chat-form");
+        const chatInput = document.getElementById("chat-input");
+        const chatMessages = document.getElementById("chat-messages");
+
+        chatForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Clear input
+            chatInput.value = "";
+
+            // Append User message
+            appendChatMessage("user", text);
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Append Loading bot message
+            const loadingId = appendChatMessage("bot", "Analyzing database patterns...", true);
+
+            try {
+                // Post to API
+                const resp = await fetch(`${API_BASE}/ai/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: text,
+                        history: chatHistory
+                    })
+                });
+                const data = await resp.json();
+
+                // Update badge based on whether it is Gemini or Simulated
+                const badge = document.getElementById("ai-engine-badge");
+                const dot = document.getElementById("ai-engine-dot");
+                if (badge && dot) {
+                    if (data.intent === "gemini") {
+                        badge.textContent = "Live AI (Gemini)";
+                        badge.className = "text-[12px] text-[#00FF87] font-semibold";
+                        dot.className = "w-2 h-2 rounded-full bg-[#00FF87] animate-pulse";
+                    } else {
+                        badge.textContent = "Simulated Intelligence";
+                        badge.className = "text-[12px] text-primary-container font-semibold";
+                        dot.className = "w-2 h-2 rounded-full bg-primary-container animate-pulse";
+                    }
+                }
+
+                // Remove loading and show reply with typing animation
+                removeLoadingMessage(loadingId);
+                simulateBotTyping(data.reply);
+                
+                // Add to history
+                chatHistory.push({ role: "user", content: text });
+                chatHistory.push({ role: "model", content: data.reply });
+
+            } catch (err) {
+                removeLoadingMessage(loadingId);
+                appendChatMessage("bot", "⚠️ Sorry, I encountered an error communicating with the AI intelligence layer. Please verify backend is active.");
+            }
+        });
+
+        // Chat clean
+        document.getElementById("btn-clear-chat").addEventListener("click", () => {
+            chatMessages.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-primary-container/20 border border-primary-container/30 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary-container text-[18px]">psychology</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl rounded-tl-none max-w-[85%] text-on-surface border border-white/5 space-y-2">
+                        <p class="font-medium text-primary-container">History Cleared</p>
+                        <p>Ask me a new query regarding carbon Scope 1/3 offsets or electrification prioritization scores.</p>
+                    </div>
+                </div>
+            `;
+            chatHistory = [];
+            const badge = document.getElementById("ai-engine-badge");
+            const dot = document.getElementById("ai-engine-dot");
+            if (badge && dot) {
+                badge.textContent = "Active Engine";
+                badge.className = "text-[12px] text-primary-container font-semibold";
+                dot.className = "w-2 h-2 rounded-full bg-primary-container animate-pulse";
+            }
+        });
+
+        function appendChatMessage(role, content, isLoading = false) {
+            const id = "msg-" + Date.now();
+            const div = document.createElement("div");
+            
+            if (role === "user") {
+                div.className = "flex items-start justify-end gap-3";
+                div.innerHTML = `
+                    <div class="bg-surface-variant/40 border border-white/10 p-4 rounded-xl rounded-tr-none max-w-[80%] text-on-surface font-medium">
+                        ${content}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-surface-variant border border-white/10 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-on-surface-variant text-[18px]">person</span>
+                    </div>
+                `;
+            } else {
+                div.className = "flex items-start gap-3";
+                div.id = id;
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-primary-container/20 border border-primary-container/30 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary-container text-[18px]">psychology</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl rounded-tl-none max-w-[85%] text-on-surface border border-white/5 space-y-2 leading-relaxed markdown-body">
+                        ${isLoading ? `<span class="flex items-center gap-1.5 text-on-surface-variant"><span class="w-2 h-2 bg-primary-container rounded-full animate-bounce"></span> ${content}</span>` : formatMarkdown(content)}
+                    </div>
+                `;
+            }
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return id;
+        }
+
+        function removeLoadingMessage(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function simulateBotTyping(text) {
+            const id = appendChatMessage("bot", "");
+            const container = document.querySelector(`#${id} .markdown-body`);
+            
+            // Format first, then apply typing
+            const formatted = formatMarkdown(text);
+            container.innerHTML = formatted;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Basic Markdown helper
+        function formatMarkdown(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\• (.*?)\n/g, '<li class="ml-4">$1</li>')
+                .replace(/\n/g, '<br/>');
+        }
+
+
+
+        // ─── REPORT GENERATOR ───
+        async function generateReport() {
+            const btn = document.getElementById('btn-generate-report');
+            btn.textContent = '⏳ Building Report...';
+            btn.disabled = true;
+            try {
+                // Fetch all data in parallel
+                const [kpis, timeseries, topRoutes, commitments, priorities, assetData] = await Promise.all([
+                    fetch(`${API_BASE}/dashboard`).then(r => r.json()),
+                    fetch(`${API_BASE}/emissions/timeseries`).then(r => r.json()),
+                    fetch(`${API_BASE}/routes/top-emitters?limit=10`).then(r => r.json()),
+                    fetch(`${API_BASE}/commitments`).then(r => r.json()),
+                    fetch(`${API_BASE}/ai/priorities`).then(r => r.json()),
+                    fetch(`${API_BASE}/emissions/by-asset-class?year=2025`).then(r => r.json()),
+                ]);
+
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+                const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+                // Build timeseries rows (2025 only)
+                const ts2025 = timeseries.filter(t => t.year === 2025);
+                const ts2024 = timeseries.filter(t => t.year === 2024);
+                const totalS1_2025 = ts2025.reduce((a, b) => a + b.scope1_tons, 0);
+                const totalS1_2024 = ts2024.reduce((a, b) => a + b.scope1_tons, 0);
+                const yoyDelta = totalS1_2024 > 0 ? (((totalS1_2025 - totalS1_2024) / totalS1_2024) * 100).toFixed(1) : '—';
+                const yoySign = parseFloat(yoyDelta) < 0 ? '▼' : '▲';
+                const yoyColor = parseFloat(yoyDelta) < 0 ? '#22c55e' : '#ef4444';
+
+                const routeRows = topRoutes.map((r, i) => `
+                    <tr style="border-bottom:1px solid #e5e7eb">
+                        <td style="padding:10px 14px;font-weight:600">${i+1}. ${r.name}</td>
+                        <td style="padding:10px 14px;text-align:right">${r.distance_km.toLocaleString()} km</td>
+                        <td style="padding:10px 14px;text-align:right;color:#ef4444;font-weight:700">${r.monthly_co2_tons.toFixed(1)} t</td>
+                        <td style="padding:10px 14px;text-align:right;color:#22c55e">${r.potential_saving_tons.toFixed(1)} t</td>
+                        <td style="padding:10px 14px;text-align:center">
+                            <span style="background:${r.is_electrified ? '#dcfce7' : '#fee2e2'};color:${r.is_electrified ? '#166534' : '#991b1b'};padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700">
+                                ${r.is_electrified ? '⚡ Electrified' : '⛽ Diesel'}
+                            </span>
+                        </td>
+                    </tr>`).join('');
+
+                const commitRows = commitments.map(c => {
+                    const pct = Math.round(c.current_reduction_pct * 100);
+                    const statusCol = c.status === 'on_track' ? '#22c55e' : '#f59e0b';
+                    const statusLabel = c.status === 'on_track' ? '✅ On Track' : '⚠️ At Risk';
+                    const targetPct = Math.round(c.reduction_target_pct * 100);
+                    return `<tr style="border-bottom:1px solid #e5e7eb">
+                        <td style="padding:10px 14px;font-weight:600">${c.organization}</td>
+                        <td style="padding:10px 14px;text-align:center">${c.baseline_year}</td>
+                        <td style="padding:10px 14px;text-align:center;font-weight:700">${c.target_year}</td>
+                        <td style="padding:10px 14px;text-align:center">${targetPct}%</td>
+                        <td style="padding:10px 14px;text-align:center">
+                            <div style="background:#e5e7eb;border-radius:4px;height:8px;width:100%;min-width:80px">
+                                <div style="background:#16a34a;width:${pct}%;height:8px;border-radius:4px"></div>
+                            </div>
+                            <span style="font-size:12px;font-weight:700">${pct}%</span>
+                        </td>
+                        <td style="padding:10px 14px;text-align:center;color:${statusCol};font-weight:700">${statusLabel}</td>
+                    </tr>`;
+                }).join('');
+
+                const priorityRows = priorities.slice(0, 5).map((p, i) => `
+                    <tr style="border-bottom:1px solid #e5e7eb">
+                        <td style="padding:10px 14px;font-weight:700;color:#1d4ed8">#${p.rank} ${p.fleet_name}</td>
+                        <td style="padding:10px 14px">${p.asset_class}</td>
+                        <td style="padding:10px 14px">${p.hub_city}</td>
+                        <td style="padding:10px 14px;text-align:right;color:#ef4444;font-weight:700">${p.annual_co2_tons.toLocaleString()} t</td>
+                        <td style="padding:10px 14px;text-align:right;color:#22c55e;font-weight:700">${p.potential_saving_tons.toLocaleString()} t</td>
+                        <td style="padding:10px 14px;text-align:center">
+                            <span style="background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700">${p.impact_score}/100</span>
+                        </td>
+                    </tr>`).join('');
+
+                const assetRows = assetData.map(a => `
+                    <tr style="border-bottom:1px solid #e5e7eb">
+                        <td style="padding:10px 14px;font-weight:600">${a.asset_class}</td>
+                        <td style="padding:10px 14px;text-align:right">${a.fleet_count}</td>
+                        <td style="padding:10px 14px;text-align:right;color:#ef4444;font-weight:700">${Number(a.scope1_tons).toLocaleString()} t</td>
+                        <td style="padding:10px 14px;text-align:right;color:#6b7280">${Number(a.scope3_tons).toLocaleString()} t</td>
+                    </tr>`).join('');
+
+                const reportHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>CarbonPulse — Net Zero Report ${dateStr}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #1e293b; font-size: 14px; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+  .cover { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f4c81 100%); color: white; padding: 60px 48px; border-radius: 16px; margin-bottom: 32px; }
+  .cover h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+  .cover .subtitle { font-size: 16px; opacity: 0.75; margin-top: 8px; }
+  .cover .meta { margin-top: 32px; display: flex; gap: 32px; font-size: 13px; opacity: 0.8; }
+  .cover .meta span { display: flex; align-items: center; gap: 6px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+  .kpi-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 4px solid #3b82f6; }
+  .kpi-card.green { border-color: #22c55e; }
+  .kpi-card.red { border-color: #ef4444; }
+  .kpi-card.amber { border-color: #f59e0b; }
+  .kpi-card.purple { border-color: #8b5cf6; }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 600; }
+  .kpi-value { font-size: 28px; font-weight: 800; margin-top: 8px; color: #0f172a; }
+  .kpi-unit { font-size: 13px; color: #64748b; margin-top: 2px; }
+  .section { background: white; border-radius: 12px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  .section h2 { font-size: 18px; font-weight: 700; color: #0f172a; padding-bottom: 16px; border-bottom: 2px solid #f1f5f9; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: #f8fafc; }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; }
+  th.right { text-align: right; }
+  th.center { text-align: center; }
+  .summary-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; }
+  .summary-box h3 { font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 10px; }
+  .summary-box p { font-size: 13px; color: #15803d; line-height: 1.6; }
+  .delta { font-size: 12px; margin-top: 4px; }
+  .print-btn { position: fixed; bottom: 24px; right: 24px; background: #1d4ed8; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(29,78,216,0.4); }
+  @media print { .print-btn { display: none; } body { background: white; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- Cover -->
+  <div class="cover">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">🌿</div>
+      <span style="font-size:13px;font-weight:700;opacity:0.8;letter-spacing:2px">CARBONPULSE</span>
+    </div>
+    <h1>Net Zero Progress &amp;<br/>Carbon Intelligence Report</h1>
+    <p class="subtitle">Indian Industrial EV Fleet — Scope 1 &amp; 3 Emissions Tracker</p>
+    <div class="meta">
+      <span>📅 Generated: ${dateStr}, ${timeStr}</span>
+      <span>🏭 Fleets Monitored: ${kpis.total_fleets}</span>
+      <span>🚛 Total Vehicles: ${Number(kpis.total_vehicles).toLocaleString()}</span>
+      <span>🗺️ Routes: ${kpis.total_routes}</span>
+    </div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="summary-box">
+    <h3>📋 Executive Summary</h3>
+    <p>
+      As of ${dateStr}, the monitored fleet portfolio has achieved <strong>${kpis.net_zero_progress_pct}%</strong> net zero reduction progress against corporate commitments.
+      EV penetration stands at <strong>${kpis.ev_penetration_pct}%</strong> across ${kpis.total_vehicles.toLocaleString()} vehicles.
+      Year-to-date Scope 1 emissions total <strong>${Number(kpis.scope1_ytd_tons).toLocaleString()} tCO₂e</strong>, with
+      <strong>${Number(kpis.ev_avoided_ytd_tons).toLocaleString()} tCO₂e</strong> avoided through electrification.
+      Scope 1 YTD vs prior year: <strong style="color:${yoyColor}">${yoySign} ${Math.abs(yoyDelta)}%</strong>.
+      Top priority fleet for immediate electrification: <strong>${kpis.top_priority_fleet}</strong>.
+    </p>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card green">
+      <div class="kpi-label">EV Penetration</div>
+      <div class="kpi-value">${kpis.ev_penetration_pct}%</div>
+      <div class="kpi-unit">of total fleet</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Scope 1 YTD</div>
+      <div class="kpi-value">${Number(kpis.scope1_ytd_tons).toLocaleString()}</div>
+      <div class="kpi-unit">tCO₂e (direct)</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Scope 3 YTD</div>
+      <div class="kpi-value">${Number(kpis.scope3_ytd_tons).toLocaleString()}</div>
+      <div class="kpi-unit">tCO₂e (upstream)</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">CO₂ Avoided by EVs</div>
+      <div class="kpi-value">${Number(kpis.ev_avoided_ytd_tons).toLocaleString()}</div>
+      <div class="kpi-unit">tCO₂e YTD</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Net Zero Progress</div>
+      <div class="kpi-value">${kpis.net_zero_progress_pct}%</div>
+      <div class="kpi-unit">toward target</div>
+    </div>
+  </div>
+
+  <!-- Monthly Emissions Trend -->
+  <div class="section">
+    <h2>📈 Monthly Emissions Trend (2025 YTD — Scope 1)</h2>
+    <table>
+      <thead><tr>
+        <th>Month</th>
+        <th class="right">Scope 1 (tCO₂e)</th>
+        <th class="right">Scope 3 (tCO₂e)</th>
+        <th class="right">EV Avoided (tCO₂e)</th>
+        <th class="right">Monthly Target (tCO₂e)</th>
+        <th class="center">vs Target</th>
+      </tr></thead>
+      <tbody>
+        ${ts2025.map(t => {
+            const vs = t.target_tons > 0 ? ((t.scope1_tons / t.target_tons - 1) * 100).toFixed(1) : '—';
+            const vsColor = parseFloat(vs) > 0 ? '#ef4444' : '#22c55e';
+            const vsLabel = parseFloat(vs) > 0 ? `▲ ${vs}% over` : `▼ ${Math.abs(vs)}% under`;
+            return `<tr style="border-bottom:1px solid #e5e7eb">
+              <td style="padding:10px 14px;font-weight:600">${t.label}</td>
+              <td style="padding:10px 14px;text-align:right;color:#ef4444">${t.scope1_tons.toLocaleString()}</td>
+              <td style="padding:10px 14px;text-align:right;color:#f59e0b">${t.scope3_tons.toLocaleString()}</td>
+              <td style="padding:10px 14px;text-align:right;color:#22c55e">${t.ev_avoided_tons.toLocaleString()}</td>
+              <td style="padding:10px 14px;text-align:right;color:#6b7280">${t.target_tons.toLocaleString()}</td>
+              <td style="padding:10px 14px;text-align:center;color:${vsColor};font-size:12px;font-weight:700">${vsLabel}</td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Top Carbon Routes -->
+  <div class="section">
+    <h2>🗺️ Top Carbon-Emitting Routes (Monthly)</h2>
+    <table>
+      <thead><tr>
+        <th>Route</th>
+        <th class="right">Distance</th>
+        <th class="right">Monthly CO₂</th>
+        <th class="right">Saving Potential</th>
+        <th class="center">Status</th>
+      </tr></thead>
+      <tbody>${routeRows}</tbody>
+    </table>
+  </div>
+
+  <!-- Carbon by Asset Class -->
+  <div class="section">
+    <h2>🏭 Carbon Footprint by Asset Class (2025 YTD)</h2>
+    <table>
+      <thead><tr>
+        <th>Asset Class</th>
+        <th class="right">Fleets</th>
+        <th class="right">Scope 1 (tCO₂e)</th>
+        <th class="right">Scope 3 (tCO₂e)</th>
+      </tr></thead>
+      <tbody>${assetRows}</tbody>
+    </table>
+  </div>
+
+  <!-- Net Zero Commitments -->
+  <div class="section">
+    <h2>🎯 Net Zero Commitments Progress</h2>
+    <table>
+      <thead><tr>
+        <th>Organization</th>
+        <th class="center">Baseline</th>
+        <th class="center">Target Year</th>
+        <th class="center">Reduction Target</th>
+        <th class="center">Current Progress</th>
+        <th class="center">Status</th>
+      </tr></thead>
+      <tbody>${commitRows}</tbody>
+    </table>
+  </div>
+
+  <!-- AI Electrification Priorities -->
+  <div class="section">
+    <h2>🏆 Top 5 AI Electrification Priorities</h2>
+    <table>
+      <thead><tr>
+        <th>Fleet</th>
+        <th>Asset Class</th>
+        <th>Hub City</th>
+        <th class="right">Annual CO₂</th>
+        <th class="right">Saving Potential</th>
+        <th class="center">Impact Score</th>
+      </tr></thead>
+      <tbody>${priorityRows}</tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:24px;color:#94a3b8;font-size:12px;border-top:1px solid #e2e8f0;margin-top:32px">
+    CarbonPulse Carbon Intelligence Platform &nbsp;•&nbsp; Generated ${dateStr} ${timeStr} &nbsp;•&nbsp; Data sourced from live fleet emission records &nbsp;•&nbsp; India CEA 2024 emission factors applied
+  </div>
+</div>
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+</body>
+</html>`;
+
+                const win = window.open('', '_blank');
+                win.document.write(reportHTML);
+                win.document.close();
+            } catch (err) {
+                console.error('Report error:', err);
+                alert('Failed to generate report. Please ensure the backend is running.');
+            } finally {
+                const btn = document.getElementById('btn-generate-report');
+                btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">summarize</span> Generate Report';
+                btn.disabled = false;
+            }
+        }
+
+        // ─── INITIALIZATION ───
+        window.addEventListener("DOMContentLoaded", () => {
+            // Load dashboard
+            switchTab("dashboard");
+            
+            // Background card motion
+            let motionEnabled = true;
+            document.addEventListener('mousemove', (e) => {
+                if (!motionEnabled) return;
+                const x = (e.clientX / window.innerWidth) - 0.5;
+                const y = (e.clientY / window.innerHeight) - 0.5;
+                document.querySelectorAll('.glass-card').forEach(card => {
+                    const speed = 3;
+                    card.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+                });
+            });
+
+            // ─── SEARCH ANALYTICS ───
+            const searchInput = document.getElementById('search-input');
+            const searchDropdown = document.getElementById('search-dropdown');
+            const searchResults = document.getElementById('search-results');
+
+            const searchIndex = [
+                { label: 'Dashboard', subtitle: 'KPIs, EV penetration, progress', icon: 'dashboard', tab: 'dashboard' },
+                { label: 'EV Fleet Penetration', subtitle: 'Percentage of EVs in total fleet', icon: 'electric_car', tab: 'dashboard' },
+                { label: 'Scope 1 Emissions', subtitle: 'Direct diesel fleet emissions YTD', icon: 'local_fire_department', tab: 'dashboard' },
+                { label: 'Scope 3 Emissions', subtitle: 'Upstream supply chain emissions YTD', icon: 'warehouse', tab: 'dashboard' },
+                { label: 'Net Zero Progress', subtitle: 'Progress toward 2035 carbon target', icon: 'track_changes', tab: 'dashboard' },
+                { label: 'Emissions Intelligence', subtitle: 'Trend charts, asset breakdown', icon: 'analytics', tab: 'emissions' },
+                { label: 'Monthly Emission Trend', subtitle: 'CO2e over time by fuel type', icon: 'show_chart', tab: 'emissions' },
+                { label: 'Asset Emission Breakdown', subtitle: 'Top emission-contributing assets', icon: 'bar_chart', tab: 'emissions' },
+                { label: 'Geospatial Route Map', subtitle: 'Live fleet routes, CO2 heatmap', icon: 'map', tab: 'map' },
+                { label: 'Carbon Route Optimizer', subtitle: 'EV vs diesel route comparison', icon: 'route', tab: 'map' },
+                { label: 'AI Carbon Advisor', subtitle: 'Smart electrification recommendations', icon: 'psychology', tab: 'ai' },
+                { label: 'Carbon Reduction Priorities', subtitle: 'AI-ranked action items', icon: 'priority_high', tab: 'ai' },
+            ];
+
+            function renderSearch(query) {
+                const q = query.trim().toLowerCase();
+                if (!q) { searchDropdown.classList.add('hidden'); return; }
+                const matches = searchIndex.filter(item =>
+                    item.label.toLowerCase().includes(q) ||
+                    item.subtitle.toLowerCase().includes(q)
+                );
+                searchResults.innerHTML = matches.length === 0
+                    ? `<div class="px-4 py-6 text-center text-on-surface-variant text-label-sm">No results for "${query}"</div>`
+                    : matches.map((m, i) => `
+                        <button data-tab="${m.tab}" class="search-result-item w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors text-left">
+                            <span class="material-symbols-outlined text-primary-container text-[20px] shrink-0">${m.icon}</span>
+                            <div class="min-w-0">
+                                <p class="text-label-md text-on-surface truncate">${m.label}</p>
+                                <p class="text-label-sm text-on-surface-variant truncate">${m.subtitle}</p>
+                            </div>
+                            <span class="material-symbols-outlined text-on-surface-variant text-[16px] ml-auto shrink-0">arrow_forward</span>
+                        </button>`).join('');
+                searchDropdown.classList.remove('hidden');
+                // Attach click on results
+                searchResults.querySelectorAll('.search-result-item').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        switchTab(btn.dataset.tab);
+                        searchInput.value = '';
+                        searchDropdown.classList.add('hidden');
+                        searchInput.blur();
+                    });
+                });
+            }
+
+            searchInput.addEventListener('input', () => renderSearch(searchInput.value));
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { searchDropdown.classList.add('hidden'); searchInput.blur(); }
+            });
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('search-wrapper').contains(e.target))
+                    searchDropdown.classList.add('hidden');
+            });
+
+            // ─── NOTIFICATIONS ───
+            const notifWrapper = document.getElementById('notif-wrapper');
+            const notifDropdown = document.getElementById('notif-dropdown');
+            const notifBadge = document.getElementById('notif-badge');
+            const notifList = document.getElementById('notif-list');
+
+            const notifications = [
+                { id: 1, read: false, level: 'error',   icon: 'warning',          title: 'High Scope 1 Spike Detected',         body: 'Diesel fleet emissions exceeded threshold by 18% on Route MH-17 this morning.', time: '2 min ago' },
+                { id: 2, read: false, level: 'warning',  icon: 'local_fire_department', title: 'Vehicle TRK-009 Overdue for EV Swap', body: 'This asset is in the top 3 emitters and eligible for immediate electrification.', time: '14 min ago' },
+                { id: 3, read: false, level: 'info',    icon: 'electric_bolt',    title: 'EV Charging Complete — Depot A',       body: '12 EVs fully charged. Fleet ready for morning dispatch.', time: '38 min ago' },
+                { id: 4, read: true,  level: 'success', icon: 'check_circle',     title: 'Net Zero Milestone Reached: 62%',      body: 'Monthly avoided emissions exceeded forecast. On track for 2030 interim target.', time: '1 hr ago' },
+                { id: 5, read: true,  level: 'info',    icon: 'summarize',        title: 'Monthly Report Ready',                 body: 'June 2025 emissions report has been generated and is ready to download.', time: '3 hrs ago' },
+            ];
+
+            const levelColors = {
+                error:   { bg: 'bg-error/10',   text: 'text-error',           border: 'border-error/20' },
+                warning: { bg: 'bg-amber-500/10', text: 'text-amber-400',     border: 'border-amber-500/20' },
+                info:    { bg: 'bg-sky-500/10',  text: 'text-sky-400',        border: 'border-sky-500/20' },
+                success: { bg: 'bg-primary-container/10', text: 'text-primary-container', border: 'border-primary-container/20' },
+            };
+
+            function renderNotifications() {
+                const unread = notifications.filter(n => !n.read).length;
+                notifBadge.textContent = unread;
+                notifBadge.classList.toggle('hidden', unread === 0);
+
+                notifList.innerHTML = notifications.map(n => {
+                    const c = levelColors[n.level];
+                    return `
+                    <div class="flex gap-3 px-4 py-3 ${n.read ? '' : c.bg} transition-colors" data-notif-id="${n.id}">
+                        <span class="material-symbols-outlined ${c.text} text-[20px] shrink-0 mt-0.5">${n.icon}</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="text-label-md font-semibold text-on-surface ${n.read ? 'opacity-60' : ''}">${n.title}</p>
+                                <span class="text-label-sm text-on-surface-variant shrink-0">${n.time}</span>
+                            </div>
+                            <p class="text-label-sm text-on-surface-variant mt-0.5 ${n.read ? 'opacity-60' : ''}">${n.body}</p>
+                            ${!n.read ? `<button class="btn-mark-one-read text-label-sm text-primary-container hover:underline mt-1" data-id="${n.id}">Mark read</button>` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+
+                notifList.querySelectorAll('.btn-mark-one-read').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const n = notifications.find(x => x.id === Number(btn.dataset.id));
+                        if (n) { n.read = true; renderNotifications(); }
+                    });
+                });
+            }
+
+            document.getElementById('btn-notifications').addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifDropdown.classList.toggle('hidden');
+                document.getElementById('settings-modal').classList.add('hidden');
+                renderNotifications();
+            });
+
+            document.getElementById('btn-mark-all-read').addEventListener('click', () => {
+                notifications.forEach(n => n.read = true);
+                renderNotifications();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!notifWrapper.contains(e.target)) notifDropdown.classList.add('hidden');
+            });
+
+            renderNotifications();
+
+            // ─── SETTINGS MODAL ───
+            const settingsModal = document.getElementById('settings-modal');
+            let refreshTimer = null;
+
+            document.getElementById('btn-settings').addEventListener('click', (e) => {
+                e.stopPropagation();
+                settingsModal.classList.toggle('hidden');
+                notifDropdown.classList.add('hidden');
+            });
+
+            document.getElementById('btn-close-settings').addEventListener('click', () => {
+                settingsModal.classList.add('hidden');
+            });
+
+            document.getElementById('settings-backdrop').addEventListener('click', () => {
+                settingsModal.classList.add('hidden');
+            });
+
+            const accentMap = {
+                green:  { primary: '#00e478', primaryContainer: '#00ff87' },
+                cyan:   { primary: '#00d4ff', primaryContainer: '#67eaff' },
+                violet: { primary: '#a78bfa', primaryContainer: '#c4b5fd' },
+                amber:  { primary: '#fbbf24', primaryContainer: '#fde68a' },
+            };
+
+            function applyAccentColor(accentKey) {
+                const acc = accentMap[accentKey];
+                if (acc) {
+                    document.documentElement.style.setProperty('--color-primary-container', acc.primaryContainer);
+                    document.documentElement.style.setProperty('--color-primary-fixed-dim', acc.primary);
+                    
+                    document.querySelectorAll('.accent-btn').forEach(b => b.style.outline = 'none');
+                    const btn = document.querySelector(`.accent-btn[data-accent="${accentKey}"]`);
+                    if (btn) btn.style.outline = '2px solid white';
+                }
+            }
+
+            // Accent color picker
+            document.getElementById('accent-options').addEventListener('click', (e) => {
+                const btn = e.target.closest('.accent-btn');
+                if (!btn) return;
+                applyAccentColor(btn.dataset.accent);
+                localStorage.setItem('cp_accent', btn.dataset.accent);
+            });
+
+            document.getElementById('btn-save-settings').addEventListener('click', () => {
+                // Show saved toast
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-primary-container text-on-primary-container font-bold text-label-md px-6 py-3 rounded-full shadow-2xl z-[9999] flex items-center gap-2 transition-all';
+                toast.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span> Settings saved';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2500);
+                settingsModal.classList.add('hidden');
+            });
+
+            const savedAccent = localStorage.getItem('cp_accent');
+            if (savedAccent) applyAccentColor(savedAccent);
+        });
+    </script>
+</body>
+</html>

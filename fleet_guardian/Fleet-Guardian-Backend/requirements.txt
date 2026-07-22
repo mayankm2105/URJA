@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+asyncpg
+pydantic
+pydantic-settings
+pandas
+numpy
+groq
+pytest
+pytest-asyncio
+httpx
+python-dotenv
+aiosqlite
